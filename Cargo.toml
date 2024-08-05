@@ -18,6 +18,9 @@ members = [
   "rustls-bench",
   # rustls cryptography provider integration tests
   "rustls-provider-test",
+  # rustls cryptography provider backed by libcrux
+  "libcrux-provider",
+
 ]
 
 ## Deliberately not included in `members`:
