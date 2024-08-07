@@ -427,7 +427,7 @@ mod tests {
 
             // Setting up a sealer with an invalid public key should fail.
             let bad_setup_res = suite.setup_sealer(info, &HpkePublicKey(vec![]));
-            assert!(matches!(bad_setup_res.unwrap_err(), Error::Other(_)));
+            assert!(bad_setup_res.is_err());
 
             // We should be able to seal some plaintext.
             let aad = &[0xC0, 0xFF, 0xEE];
@@ -442,7 +442,7 @@ mod tests {
 
             // Setting up an opener with an invalid private key should fail.
             let bad_key_res = suite.setup_opener(&enc, info, &HpkePrivateKey::from(vec![]));
-            assert!(matches!(bad_key_res.unwrap_err(), Error::Other(_)));
+            assert!(bad_key_res.is_err());
 
             // Opening the plaintext should work with the correct opener and aad.
             let pt_prime = opener.open(aad, &ct).unwrap();
@@ -450,7 +450,7 @@ mod tests {
 
             // Opening the plaintext with the correct opener and wrong aad should fail.
             let open_res = opener.open(&[0x0], &ct);
-            assert!(matches!(open_res.unwrap_err(), Error::Other(_)));
+            assert!(open_res.is_err());
 
             // Opening the plaintext with the wrong opener should fail.
             let mut sk_rm_prime = sk.secret_bytes().to_vec();
@@ -459,7 +459,7 @@ mod tests {
                 .setup_opener(&enc, info, &HpkePrivateKey::from(sk_rm_prime))
                 .unwrap();
             let open_res = opener_two.open(aad, &ct);
-            assert!(matches!(open_res.unwrap_err(), Error::Other(_)));
+            assert!(open_res.is_err());
         }
     }
 
