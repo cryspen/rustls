@@ -1,11 +1,14 @@
 use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
-use crypto::SupportedKxGroup;
-use rustls::crypto;
+use libcrux::ecdh;
+
+use rustls::crypto::{self, SupportedKxGroup as _};
 
 pub struct KeyExchange {
-    priv_key: x25519_dalek::EphemeralSecret,
-    pub_key: x25519_dalek::PublicKey,
+    priv_key: Vec<u8>,
+    pub_key: Vec<u8>,
 }
 
 impl crypto::ActiveKeyExchange for KeyExchange {
@@ -13,16 +16,14 @@ impl crypto::ActiveKeyExchange for KeyExchange {
         self: Box<KeyExchange>,
         peer: &[u8],
     ) -> Result<crypto::SharedSecret, rustls::Error> {
-        let peer_array: [u8; 32] = peer
-            .try_into()
-            .map_err(|_| rustls::Error::from(rustls::PeerMisbehaved::InvalidKeyShare))?;
-        let their_pub = x25519_dalek::PublicKey::from(peer_array);
-        let shared_secret = self.priv_key.diffie_hellman(&their_pub);
-        Ok(crypto::SharedSecret::from(&shared_secret.as_bytes()[..]))
+        let shared_secret = ecdh::derive(ecdh::Algorithm::X25519, peer, self.priv_key)
+            .map_err(|_| rustls::Error::General(String::from("ecdh derive error")))?;
+
+        Ok(crypto::SharedSecret::from(&shared_secret[..]))
     }
 
     fn pub_key(&self) -> &[u8] {
-        self.pub_key.as_bytes()
+        &self.pub_key[..]
     }
 
     fn group(&self) -> rustls::NamedGroup {
@@ -30,18 +31,18 @@ impl crypto::ActiveKeyExchange for KeyExchange {
     }
 }
 
-pub const ALL_KX_GROUPS: &[&dyn SupportedKxGroup] = &[&X25519 as &dyn SupportedKxGroup];
+pub const ALL_KX_GROUPS: &[&dyn crypto::SupportedKxGroup] =
+    &[&X25519 as &dyn crypto::SupportedKxGroup];
 
 #[derive(Debug)]
 pub struct X25519;
 
 impl crypto::SupportedKxGroup for X25519 {
     fn start(&self) -> Result<Box<dyn crypto::ActiveKeyExchange>, rustls::Error> {
-        let priv_key = x25519_dalek::EphemeralSecret::random_from_rng(rand_core::OsRng);
-        Ok(Box::new(KeyExchange {
-            pub_key: (&priv_key).into(),
-            priv_key,
-        }))
+        let (priv_key, pub_key) = ecdh::key_gen(ecdh::Algorithm::X25519, &mut rand_core::OsRng)
+            .map_err(|_| rustls::Error::General(String::from("ecdh keygen error")))?;
+
+        Ok(Box::new(KeyExchange { pub_key, priv_key }))
     }
 
     fn name(&self) -> rustls::NamedGroup {
