@@ -2368,6 +2368,7 @@ dependencies = [
  "hpke-rs-rust-crypto",
  "libcrux",
  "p256",
+ "pkcs1",
  "pkcs8",
  "rand_core",
  "rcgen",
