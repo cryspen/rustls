@@ -6,7 +6,7 @@ license = "Apache-2.0 OR ISC OR MIT"
 description = "A rustls crypto provider based on libcrux."
 
 [dependencies]
-libcrux = { path = "../../libcrux/" }
+libcrux = { git = "https://github.com/cryspen/libcrux" }
 chacha20poly1305 = { version = "0.10", default-features = false, features = [
   "alloc",
 ] }

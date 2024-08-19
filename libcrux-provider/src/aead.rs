@@ -1,3 +1,5 @@
+use std::eprintln;
+
 use alloc::boxed::Box;
 
 use rustls::{
@@ -94,16 +96,23 @@ impl MessageEncrypter for Tls13Cipher {
         // self.0
         //     .encrypt_in_place(&nonce, &aad, &mut EncryptBufferAdapter(&mut payload))
 
-        libcrux::aead::encrypt(&self.0, payload.as_mut(), iv, &aad)
+        eprintln!(" >>> Encrypting");
+        // eprintln!("key: {:x?}", self.0);
+        eprintln!("iv: {:x?}", nonce.0);
+        eprintln!("aad: {:x?}", aad);
+
+        let out = libcrux::aead::encrypt(&self.0, payload.as_mut(), iv, &aad)
             .map_err(|_| rustls::Error::EncryptError)
             .map(|tag| {
                 payload.extend_from_slice(tag.as_ref());
                 OutboundOpaqueMessage::new(
                     ContentType::ApplicationData,
-                    ProtocolVersion::TLSv1_2,
+                    ProtocolVersion::TLSv1_3,
                     payload,
                 )
-            })
+            });
+        eprintln!("payload: {:x?}", out.as_ref());
+        out
     }
 
     fn encrypted_payload_len(&self, payload_len: usize) -> usize {
@@ -118,20 +127,30 @@ impl MessageDecrypter for Tls13Cipher {
         seq: u64,
     ) -> Result<InboundPlainMessage<'a>, rustls::Error> {
         let payload_and_tag = &mut m.payload;
+        let total_len = payload_and_tag.len();
+        eprintln!("payload_and_tag: {:x?}", payload_and_tag.as_ref());
         let payload_and_tag_len = payload_and_tag.len();
         if payload_and_tag_len < TAG_LEN {
+            eprintln!(" >>> DecryptError 1");
             return Err(rustls::Error::DecryptError);
         }
 
         let (payload, tag) = payload_and_tag.split_at_mut(payload_and_tag_len - TAG_LEN);
 
         let nonce = Nonce::new(&self.1, seq);
-        let aad = make_tls13_aad(payload.len());
+        let aad = make_tls13_aad(total_len);
         let iv = libcrux::aead::Iv(nonce.0);
         let tag = Tag::from_slice(tag).unwrap();
 
+        eprintln!(" >>> DecryptError 2");
+        eprintln!("payload: {:x?}", payload);
+        // eprintln!("key: {:x?}", self.0);
+        eprintln!("iv: {:x?}", nonce.0);
+        eprintln!("tag: {:x?}", tag);
+        eprintln!("aad: {:x?}", aad);
         libcrux::aead::decrypt(&self.0, payload, iv, &aad, &tag)
             .map_err(|_| rustls::Error::DecryptError)?;
+        eprintln!("  ---- out");
 
         m.into_tls13_unpadded_message()
     }
