@@ -12,21 +12,25 @@ use serde::Deserialize;
 #[test]
 fn check_test_vectors() {
     for (idx, vec) in test_vectors().into_iter().enumerate() {
+        println!("# testing vector {idx}");
+
         let Some(hpke_pairs) = vec.applicable() else {
             println!("skipping inapplicable vector {idx}");
             continue;
         };
 
-        println!("testing vector {idx}");
         let pk_r = HpkePublicKey(hex::decode(vec.pk_rm).unwrap());
         let sk_r = HpkePrivateKey::from(hex::decode(vec.sk_rm).unwrap());
         let info = hex::decode(vec.info).unwrap();
 
-        for enc in vec.encryptions {
+        for (idx, enc) in vec.encryptions.into_iter().enumerate() {
+            println!("## testing encryption {idx}");
             let aad = hex::decode(enc.aad).unwrap();
             let pt = hex::decode(enc.pt).unwrap();
 
-            for (sealer, opener) in &hpke_pairs {
+            for (idx, (sealer, opener)) in hpke_pairs.iter().enumerate() {
+                println!("### testing pair {idx}");
+
                 let (enc, ciphertext) = sealer
                     .seal(&info, &aad, &pt, &pk_r)
                     .unwrap();
@@ -77,30 +81,53 @@ impl TestVector {
             return None;
         }
 
-        match (
-            Self::lookup_suite(self.suite(), aws_lc_rs::hpke::ALL_SUPPORTED_SUITES),
-            Self::lookup_suite(self.suite(), provider_example::hpke::ALL_SUPPORTED_SUITES),
-        ) {
-            // Both providers support the suite. Test against themselves, and each other.
-            (Some(aws_suite), Some(hpke_rs_suite)) => Some(vec![
-                (aws_suite, aws_suite),
-                (hpke_rs_suite, hpke_rs_suite),
-                (aws_suite, hpke_rs_suite),
-                (hpke_rs_suite, aws_suite),
-            ]),
+        let supported: Vec<_> = None
+            .into_iter()
+            .chain(Self::lookup_suite(
+                self.suite(),
+                aws_lc_rs::hpke::ALL_SUPPORTED_SUITES,
+            ))
+            .chain(Self::lookup_suite(
+                self.suite(),
+                provider_example::hpke::ALL_SUPPORTED_SUITES,
+            ))
+            .chain(Self::lookup_suite(
+                self.suite(),
+                libcrux_provider::hpke::ALL_SUPPORTED_SUITES,
+            ))
+            .collect();
 
-            // aws-lc-rs supported the suite, not hpke-rs, test against itself
-            (Some(aws_suite), None) => Some(vec![(aws_suite, aws_suite)]),
+        let permute2 = |a, b| [(a, a), (a, b), (b, a), (b, a)];
 
-            // hpke-rs supported the suite, not AWS-LC-RS, test against itself
-            //
-            // Note: presently there are no suites hpke-rs supports that aws-lc-rs doesn't. This
-            //       is future-proofing.
-            (None, Some(hpke_rs_suite)) => Some(vec![(hpke_rs_suite, hpke_rs_suite)]),
+        let pairs = match supported.len() {
+            0 => None,
+            1 => Some(vec![(0, 0)]),
+            2 => Some(permute2(0, 1).to_vec()),
+            3 => Some(
+                None.into_iter()
+                    .chain(permute2(0, 1))
+                    .chain(permute2(0, 2))
+                    .chain(permute2(1, 2))
+                    .collect(),
+            ),
+            _ => unreachable!(),
+        };
 
-            // Neither provider supported the suite - nothing to do.
-            (None, None) => None,
+        if let Some(pairs) = pairs.as_ref() {
+            println!("pairs:");
+            for (i, pair) in pairs.iter().enumerate() {
+                println!("  {i: >2}: {pair:?}")
+            }
+        } else {
+            println!("no pairs.")
         }
+
+        pairs.map(|pairs| {
+            pairs
+                .into_iter()
+                .map(|(a, b)| (supported[a], supported[b]))
+                .collect()
+        })
     }
 
     fn lookup_suite(
