@@ -152,6 +152,9 @@ impl MessageDecrypter for Tls13Cipher {
             .map_err(|_| rustls::Error::DecryptError)?;
         eprintln!("  ---- out");
 
+        m.payload
+            .truncate(m.payload.len() - TAG_LEN);
+
         m.into_tls13_unpadded_message()
     }
 }
