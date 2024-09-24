@@ -212,6 +212,9 @@ impl MessageDecrypter for Tls12Cipher {
         libcrux::aead::decrypt(&self.0, payload.as_mut(), iv, &aad, &tag)
             .map_err(|_| rustls::Error::DecryptError)?;
 
+        m.payload
+            .truncate(m.payload.len() - TAG_LEN);
+
         Ok(m.into_plain_message())
     }
 }

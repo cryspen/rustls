@@ -293,7 +293,7 @@ fn der_encode_ecdsa_signature(sig: &signature::EcDsaP256Signature) -> der::Resul
     let r = UintRef::new(r)?;
     let s = UintRef::new(s)?;
 
-    let mut bytes = [0u8; 72];
+    let mut bytes = [0u8; 73];
     let mut writer = der::SliceWriter::new(&mut bytes);
 
     writer.sequence((r.encoded_len()? + s.encoded_len()?)?, |seq| {
