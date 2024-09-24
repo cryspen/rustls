@@ -6,7 +6,7 @@ use libcrux::signature::{
 use rustls::crypto::WebPkiSupportedAlgorithms;
 use rustls::pki_types::{AlgorithmIdentifier, InvalidSignature, SignatureVerificationAlgorithm};
 use rustls::SignatureScheme;
-use webpki::alg_id::{self};
+use webpki::{alg_id, aws_lc_rs::RSA_PKCS1_2048_8192_SHA256 as AWS_LC_RSA_PKCS1_SHA256};
 
 pub static ALGORITHMS: WebPkiSupportedAlgorithms = WebPkiSupportedAlgorithms {
     all: &[
@@ -15,6 +15,7 @@ pub static ALGORITHMS: WebPkiSupportedAlgorithms = WebPkiSupportedAlgorithms {
         RSA_PSS_SHA512,
         ED25519,
         ECDSA_P256_SHA256,
+        AWS_LC_RSA_PKCS1_SHA256,
     ],
     mapping: &[
         (SignatureScheme::RSA_PSS_SHA256, &[RSA_PSS_SHA256]),
@@ -22,6 +23,10 @@ pub static ALGORITHMS: WebPkiSupportedAlgorithms = WebPkiSupportedAlgorithms {
         (SignatureScheme::RSA_PSS_SHA512, &[RSA_PSS_SHA512]),
         (SignatureScheme::ED25519, &[ED25519]),
         (SignatureScheme::ECDSA_NISTP256_SHA256, &[ECDSA_P256_SHA256]),
+        (
+            SignatureScheme::RSA_PKCS1_SHA256,
+            &[AWS_LC_RSA_PKCS1_SHA256],
+        ),
     ],
 };
 
