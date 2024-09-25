@@ -2446,6 +2446,7 @@ dependencies = [
  "rcgen",
  "ring",
  "rustls-pki-types",
+ "rustls-post-quantum",
  "rustls-webpki",
  "rustversion",
  "serde",
