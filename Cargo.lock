@@ -3205,6 +3205,6 @@ dependencies = [
 
 [[package]]
 name = "zlib-rs"
-version = "0.2.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e942bb8453553ee59b701f977d5331a512f8dd07906153bbe050cb9bb58a4811"
+checksum = "2ca4a9dc6566c9224cc161dedc5577bd81f4a9ee0f9fbe80592756d096b07ee5"
