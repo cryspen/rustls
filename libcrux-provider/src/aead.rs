@@ -107,7 +107,7 @@ impl MessageEncrypter for Tls13Cipher {
                 payload.extend_from_slice(tag.as_ref());
                 OutboundOpaqueMessage::new(
                     ContentType::ApplicationData,
-                    ProtocolVersion::TLSv1_3,
+                    ProtocolVersion::TLSv1_2,
                     payload,
                 )
             });
