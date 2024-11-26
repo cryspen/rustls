@@ -1316,7 +1316,7 @@ dependencies = [
  "ipnet",
  "once_cell",
  "rand",
- "rustls 0.23.14",
+ "rustls 0.23.18",
  "thiserror",
  "tinyvec",
  "tokio",
@@ -1341,7 +1341,7 @@ dependencies = [
  "parking_lot",
  "rand",
  "resolv-conf",
- "rustls 0.23.14",
+ "rustls 0.23.18",
  "smallvec",
  "thiserror",
  "tokio",
@@ -1602,7 +1602,7 @@ checksum = "561d97a539a36e26a9a5fad1ea11a3039a67714694aaa379433e580854bc3dc5"
 [[package]]
 name = "libcrux"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "hax-lib 0.1.0-pre.1 (git+https://github.com/hacspec/hax/?branch=main)",
  "hax-lib-macros 0.1.0-pre.1 (git+https://github.com/hacspec/hax/?branch=main)",
@@ -1611,15 +1611,15 @@ dependencies = [
  "libcrux-hkdf",
  "libcrux-hmac",
  "libcrux-kem",
- "libcrux-ml-kem",
- "libcrux-platform",
+ "libcrux-ml-kem 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
  "rand",
 ]
 
 [[package]]
 name = "libcrux-ecdh"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "libcrux-hacl",
  "rand",
@@ -1628,16 +1628,16 @@ dependencies = [
 [[package]]
 name = "libcrux-hacl"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "cc",
- "libcrux-platform",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
 ]
 
 [[package]]
 name = "libcrux-hkdf"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "libcrux-hacl",
 ]
@@ -1645,11 +1645,16 @@ dependencies = [
 [[package]]
 name = "libcrux-hmac"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "libcrux-hacl",
  "libcrux-hkdf",
 ]
+
+[[package]]
+name = "libcrux-intrinsics"
+version = "0.0.2-alpha.3"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 
 [[package]]
 name = "libcrux-intrinsics"
@@ -1659,12 +1664,24 @@ source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f
 [[package]]
 name = "libcrux-kem"
 version = "0.0.2-alpha.3"
-source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "libcrux-ecdh",
- "libcrux-ml-kem",
- "libcrux-sha3",
+ "libcrux-ml-kem 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "libcrux-sha3 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
  "rand",
+]
+
+[[package]]
+name = "libcrux-ml-kem"
+version = "0.0.2-alpha.3"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+dependencies = [
+ "hax-lib 0.1.0-pre.1 (git+https://github.com/hacspec/hax/)",
+ "libcrux-intrinsics 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "libcrux-sha3 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "rand_core",
 ]
 
 [[package]]
@@ -1673,10 +1690,18 @@ version = "0.0.2-alpha.3"
 source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "hax-lib 0.1.0-pre.1 (git+https://github.com/hacspec/hax/)",
- "libcrux-intrinsics",
- "libcrux-platform",
- "libcrux-sha3",
+ "libcrux-intrinsics 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
+ "libcrux-sha3 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
  "rand_core",
+]
+
+[[package]]
+name = "libcrux-platform"
+version = "0.0.2-alpha.3"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -1690,11 +1715,21 @@ dependencies = [
 [[package]]
 name = "libcrux-sha3"
 version = "0.0.2-alpha.3"
+source = "git+https://github.com/cryspen/libcrux?rev=80d195d34#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
+dependencies = [
+ "hax-lib 0.1.0-pre.1 (git+https://github.com/hacspec/hax/)",
+ "libcrux-intrinsics 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux?rev=80d195d34)",
+]
+
+[[package]]
+name = "libcrux-sha3"
+version = "0.0.2-alpha.3"
 source = "git+https://github.com/cryspen/libcrux#80d195d34da7eb42cf2b0f3ae8f387f8c02bb964"
 dependencies = [
  "hax-lib 0.1.0-pre.1 (git+https://github.com/hacspec/hax/)",
- "libcrux-intrinsics",
- "libcrux-platform",
+ "libcrux-intrinsics 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
+ "libcrux-platform 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
 ]
 
 [[package]]
@@ -2415,21 +2450,6 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "415d9944693cb90382053259f89fbb077ea730ad7273047ec63b19bc9b160ba8"
-dependencies = [
- "log",
- "once_cell",
- "ring",
- "rustls-pki-types",
- "rustls-webpki",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "rustls"
 version = "0.23.17"
 dependencies = [
  "aws-lc-rs",
@@ -2455,6 +2475,22 @@ dependencies = [
  "webpki-roots",
  "zeroize",
  "zlib-rs",
+]
+
+[[package]]
+name = "rustls"
+version = "0.23.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c9cc1d47e243d655ace55ed38201c19ae02c148ae56412ab8750e8f0166ab7f"
+dependencies = [
+ "aws-lc-rs",
+ "log",
+ "once_cell",
+ "ring",
+ "rustls-pki-types",
+ "rustls-webpki",
+ "subtle",
+ "zeroize",
 ]
 
 [[package]]
@@ -2504,7 +2540,7 @@ dependencies = [
  "log",
  "mio 0.8.11",
  "rcgen",
- "rustls 0.23.17",
+ "rustls 0.23.18",
  "rustls-libcrux-provider",
  "serde",
  "serde_derive",
@@ -2525,14 +2561,14 @@ dependencies = [
  "hpke-rs-crypto",
  "hpke-rs-rust-crypto",
  "libcrux",
- "libcrux-ml-kem",
+ "libcrux-ml-kem 0.0.2-alpha.3 (git+https://github.com/cryspen/libcrux)",
  "p256",
  "pkcs1",
  "pkcs8",
  "rand_core",
  "rcgen",
  "rsa",
- "rustls 0.23.17",
+ "rustls 0.23.18",
  "rustls-pki-types",
  "rustls-webpki",
  "sha2",
@@ -2914,7 +2950,7 @@ version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c7bc40d0e5a97695bb96e27995cd3a08538541b0a846f65bba7a359f36700d4"
 dependencies = [
- "rustls 0.23.14",
+ "rustls 0.23.18",
  "rustls-pki-types",
  "tokio",
 ]
