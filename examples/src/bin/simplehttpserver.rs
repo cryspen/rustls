@@ -13,9 +13,10 @@ use std::io::{ErrorKind, Read, Write};
 use std::net::TcpListener;
 use std::sync::Arc;
 
+use log::{log, Level};
 use rustls::pki_types::pem::PemObject;
 use rustls::pki_types::{CertificateDer, PrivateKeyDer};
-use rustls::DEFAULT_VERSIONS;
+use rustls::{ServerConfig, DEFAULT_VERSIONS};
 
 fn main() -> Result<(), Box<dyn StdError>> {
     let mut args = env::args();
@@ -41,20 +42,42 @@ fn main() -> Result<(), Box<dyn StdError>> {
             .with_single_cert(certs, private_key)?;
 
     let listener = TcpListener::bind(format!("[::]:{}", 4443)).unwrap();
-    let (mut stream, _) = listener.accept()?;
 
-    let mut conn = rustls::ServerConnection::new(Arc::new(config))?;
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                if let Err(err) = handle_connection(stream, config.clone()) {
+                    log!(Level::Error, "error handling connection: {err}");
+                }
+            }
+            Err(err) => {
+                log!(Level::Error, "error in incoming stream: {err}");
+            }
+        }
+    }
 
-    conn.complete_io(&mut stream).unwrap();
+    Ok(())
+}
 
+fn handle_connection(
+    mut stream: std::net::TcpStream,
+    config: ServerConfig,
+) -> Result<(), HttpsServerError> {
     let mut req_buf = [0; 128];
+
+    let mut conn = rustls::ServerConnection::new(Arc::new(config.clone()))
+        .map_err(HttpsServerError::Rustls)?;
+
+    conn.complete_io(&mut stream)
+        .map_err(HttpsServerError::Io)?;
 
     let len = loop {
         match conn.reader().read(&mut req_buf) {
             Err(err) if err.kind() == ErrorKind::WouldBlock => {
-                conn.complete_io(&mut stream).unwrap();
+                conn.complete_io(&mut stream)
+                    .map_err(HttpsServerError::Io)?;
             }
-            Err(err) => panic!("{}", err),
+            Err(err) => return Err(HttpsServerError::Io(err)),
             Ok(len) => break len,
         }
     };
@@ -68,7 +91,22 @@ fn main() -> Result<(), Box<dyn StdError>> {
         .write_all(b"HTTP/1.1 200 OK\nConnection: close\n\nHello from the server")
         .unwrap();
 
-    conn.complete_io(&mut stream).unwrap();
+    conn.complete_io(&mut stream)
+        .map_err(HttpsServerError::Io)?;
 
     Ok(())
+}
+
+enum HttpsServerError {
+    Io(std::io::Error),
+    Rustls(rustls::Error),
+}
+
+impl std::fmt::Display for HttpsServerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HttpsServerError::Io(err) => write!(f, "io error: {err}"),
+            HttpsServerError::Rustls(err) => write!(f, "rustls error: {err}"),
+        }
+    }
 }
