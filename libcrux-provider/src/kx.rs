@@ -6,6 +6,8 @@ use libcrux::ecdh;
 
 use rustls::crypto::{self, SupportedKxGroup as _};
 
+use crate::pq::X25519MlKem768;
+
 pub struct KeyExchange {
     priv_key: Vec<u8>,
     pub_key: Vec<u8>,
@@ -31,8 +33,10 @@ impl crypto::ActiveKeyExchange for KeyExchange {
     }
 }
 
-pub const ALL_KX_GROUPS: &[&dyn crypto::SupportedKxGroup] =
-    &[&X25519 as &dyn crypto::SupportedKxGroup];
+pub const ALL_KX_GROUPS: &[&dyn crypto::SupportedKxGroup] = &[
+    &X25519 as &dyn crypto::SupportedKxGroup,
+    &X25519MlKem768 as &dyn crypto::SupportedKxGroup,
+];
 
 #[derive(Debug)]
 pub struct X25519;
